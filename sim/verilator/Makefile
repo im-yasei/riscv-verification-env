@@ -9,7 +9,7 @@ CXX := g++
 
 VERILATOR_FLAGS := --cc --top-module test_top \
                    -Wno-MODDUP -Wno-MULTITOP -Wno-IMPLICIT -Wno-WIDTHEXPAND -Wno-WIDTHTRUNC \
-                   -Wno-CASEINCOMPLETE -Wno-COMBDLY -Wno-UNOPTFLAT \
+                   -Wno-CASEINCOMPLETE -Wno-COMBDLY -Wno-UNOPTFLAT -Wno-BLKANDNBLK\
                    --no-timing --build
 
 CXXFLAGS := -I$(OBJ_DIR) \
@@ -21,7 +21,14 @@ CXXFLAGS := -I$(OBJ_DIR) \
 
 LDFLAGS := -lpthread
 
-VERILOG_SRC := $(wildcard $(RTL_DIR)/*.sv) test_top.sv
+VERILOG_SRC := $(RTL_DIR)/memory_pkg.sv \
+               $(RTL_DIR)/alu_opcodes_pkg.sv \
+               $(RTL_DIR)/csr_pkg.sv \
+               $(RTL_DIR)/decoder_pkg.sv \
+               $(RTL_DIR)/peripheral_pkg.sv \
+               $(filter-out %_pkg.sv, $(wildcard $(RTL_DIR)/*.sv)) \
+               test_top.sv
+
 TESTS_WITH_API_SRC := $(wildcard $(TESTS_WITH_API_DIR)/*.cpp)
 
 MODEL_LIB := $(OBJ_DIR)/Vtest_top__ALL.a
