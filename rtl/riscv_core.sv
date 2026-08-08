@@ -183,7 +183,7 @@ module processor_core (
     output logic irq_ret_o
 );
 
-  logic [31:0] KD;
+  logic [31:0] KD /*verilator public_flat_rw*/;
   logic [31:0] RPgcnv34Ab8;
   logic [ 1:0] C56l2;
   logic [ 2:0] i2H9F;
