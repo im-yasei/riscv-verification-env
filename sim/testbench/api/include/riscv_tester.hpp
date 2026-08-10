@@ -34,6 +34,18 @@ public:
   void write_register(int index, uint32_t value);
   void clear_registers();
 
+  // memory
+  uint32_t read_word(uint32_t addr);
+  void write_word(uint32_t addr, uint32_t value);
+
+  uint16_t read_hword(uint32_t addr);
+  void write_hword(uint32_t addr, uint16_t value);
+
+  uint8_t read_byte(uint32_t addr);
+  void write_byte(uint32_t addr, uint8_t value);
+
+  void clear_ram();
+
   // pc
   void set_pc(uint32_t value);
   uint32_t get_pc();

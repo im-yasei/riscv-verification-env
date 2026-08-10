@@ -1,5 +1,6 @@
 #include "riscv_tester.hpp"
 #include "Vtest_top___024root.h"
+#include <cstdint>
 #include <iostream>
 
 // utils
@@ -14,6 +15,7 @@ void RiscVTester::system_reset() {
   evaluate();
 
   clear_registers();
+  clear_ram();
   evaluate();
 }
 
@@ -53,6 +55,80 @@ void RiscVTester::write_register(int index, uint32_t value) {
 void RiscVTester::clear_registers() {
   for (int i = 0; i < 32; i++) {
     write_register(i, 0);
+  }
+}
+
+// memory
+uint32_t RiscVTester::read_word(uint32_t addr) {
+  if ((addr & 0x3) != 0) {
+    std::cerr << "ERROR: read_word invalid address" << std::endl;
+    return 0;
+  }
+
+  return top->rootp->test_top__DOT__data_mem__DOT__ram[addr >> 2];
+}
+
+void RiscVTester::write_word(uint32_t addr, uint32_t value) {
+  if ((addr & 0x3) != 0) {
+    std::cerr << "ERROR: write_word invalid address" << std::endl;
+    return;
+  }
+
+  top->rootp->test_top__DOT__data_mem__DOT__ram[addr >> 2] = value;
+}
+
+uint16_t RiscVTester::read_hword(uint32_t addr) {
+  if ((addr & 0x1) != 0) {
+    std::cerr << "ERROR: read_hword invalid address" << std::endl;
+    return 0;
+  }
+
+  uint32_t word = top->rootp->test_top__DOT__data_mem__DOT__ram[addr >> 2];
+  uint16_t offset = addr & 0x3;
+  uint16_t hword = (word >> (offset * 8)) & 0x0000ffff;
+
+  return hword;
+}
+
+void RiscVTester::write_hword(uint32_t addr, uint16_t value) {
+  if ((addr & 0x1) != 0) {
+    std::cerr << "ERROR: write_hword invalid address" << std::endl;
+    return;
+  }
+
+  uint32_t word = top->rootp->test_top__DOT__data_mem__DOT__ram[addr >> 2];
+  uint16_t offset = addr & 0x3;
+  uint32_t value32 = value;
+  uint32_t mask = (offset == 0) ? 0xffff0000 : 0x0000ffff;
+
+  word = word & mask;
+  word = word | (value32 << (offset * 8));
+
+  top->rootp->test_top__DOT__data_mem__DOT__ram[addr >> 2] = word;
+}
+
+uint8_t RiscVTester::read_byte(uint32_t addr) {
+  uint32_t word = top->rootp->test_top__DOT__data_mem__DOT__ram[addr >> 2];
+  uint16_t offset = addr & 0x3;
+  uint8_t byte = (word >> (offset * 8)) & 0xff;
+
+  return byte;
+}
+
+void RiscVTester::write_byte(uint32_t addr, uint8_t value) {
+  uint32_t word = top->rootp->test_top__DOT__data_mem__DOT__ram[addr >> 2];
+  uint16_t offset = addr & 0x3;
+  uint32_t value32 = value;
+
+  word = word & ~(0xff << (offset * 8));
+  word = word | (value32 << (offset * 8));
+
+  top->rootp->test_top__DOT__data_mem__DOT__ram[addr >> 2] = word;
+}
+
+void RiscVTester::clear_ram() {
+  for (int i = 0; i < 32; i++) {
+    top->rootp->test_top__DOT__data_mem__DOT__ram[i] = 0;
   }
 }
 
