@@ -54,7 +54,7 @@ $(TEST_WITH_API_EXE): $(ALL_SRC) $(MODEL_LIB)
 		-o $@
 
 run: $(TEST_WITH_API_EXE)
-	cd $(BUILD_DIR) && ./test
+	@cd $(BUILD_DIR) && ./test $(mask)
 
 clean:
 	rm -rf $(BUILD_DIR)
