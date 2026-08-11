@@ -5,6 +5,7 @@
 class RiscVTester {
 private:
   Vtest_top *top;
+  void evaluate();
 
 public:
   RiscVTester() { top = new Vtest_top; }
@@ -15,7 +16,6 @@ public:
 
   // utils
   void system_reset();
-  void evaluate();
 
   // ===FRONTDOOR API===
   void tick();
