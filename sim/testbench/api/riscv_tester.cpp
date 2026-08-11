@@ -16,7 +16,6 @@ void RiscVTester::system_reset() {
 
   clear_registers();
   clear_ram();
-  evaluate();
 }
 
 void RiscVTester::evaluate() { top->eval(); }
@@ -29,11 +28,23 @@ void RiscVTester::tick() {
   evaluate();
 }
 
-void RiscVTester::enable_rst() { top->rst_i = 1; }
-void RiscVTester::disable_rst() { top->rst_i = 0; }
+void RiscVTester::enable_rst() {
+  top->rst_i = 1;
+  evaluate();
+}
+void RiscVTester::disable_rst() {
+  top->rst_i = 0;
+  evaluate();
+}
 
-void RiscVTester::enable_irq_req_i() { top->irq_req_i = 1; }
-void RiscVTester::disable_irq_req_i() { top->irq_req_i = 0; }
+void RiscVTester::enable_irq_req_i() {
+  top->irq_req_i = 1;
+  evaluate();
+}
+void RiscVTester::disable_irq_req_i() {
+  top->irq_req_i = 0;
+  evaluate();
+}
 
 bool RiscVTester::get_irq_ret_o() { return top->irq_ret_o; }
 
@@ -50,12 +61,14 @@ uint32_t RiscVTester::read_register(int index) {
 
 void RiscVTester::write_register(int index, uint32_t value) {
   top->rootp->test_top__DOT__core__DOT__v9QOWb9Pd9__DOT__rf_mem[index] = value;
+  evaluate();
 }
 
 void RiscVTester::clear_registers() {
   for (int i = 0; i < 32; i++) {
-    write_register(i, 0);
+    top->rootp->test_top__DOT__core__DOT__v9QOWb9Pd9__DOT__rf_mem[i] = 0;
   }
+  evaluate();
 }
 
 // memory
@@ -75,6 +88,7 @@ void RiscVTester::write_word(uint32_t addr, uint32_t value) {
   }
 
   top->rootp->test_top__DOT__data_mem__DOT__ram[addr >> 2] = value;
+  evaluate();
 }
 
 uint16_t RiscVTester::read_hword(uint32_t addr) {
@@ -105,6 +119,7 @@ void RiscVTester::write_hword(uint32_t addr, uint16_t value) {
   word = word | (value32 << (offset * 8));
 
   top->rootp->test_top__DOT__data_mem__DOT__ram[addr >> 2] = word;
+  evaluate();
 }
 
 uint8_t RiscVTester::read_byte(uint32_t addr) {
@@ -124,17 +139,20 @@ void RiscVTester::write_byte(uint32_t addr, uint8_t value) {
   word = word | (value32 << (offset * 8));
 
   top->rootp->test_top__DOT__data_mem__DOT__ram[addr >> 2] = word;
+  evaluate();
 }
 
 void RiscVTester::clear_ram() {
   for (int i = 0; i < 32; i++) {
     top->rootp->test_top__DOT__data_mem__DOT__ram[i] = 0;
   }
+  evaluate();
 }
 
 // pc
 void RiscVTester::set_pc(uint32_t value) {
   top->rootp->test_top__DOT__core__DOT__KD = value;
+  evaluate();
 }
 
 uint32_t RiscVTester::get_pc() {
