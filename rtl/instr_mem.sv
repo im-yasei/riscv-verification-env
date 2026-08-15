@@ -16,9 +16,9 @@ import memory_pkg::INSTR_MEM_SIZE_WORDS;
   output logic [31:0] read_data_o
 );
 
-  logic [31:0] ROM [INSTR_MEM_SIZE_WORDS];  // создать память с
-                                            // <INSTR_MEM_SIZE_WORDS>
-                                            // 32-битных ячеек
+  logic [31:0] ROM [INSTR_MEM_SIZE_WORDS] /*verilator public_flat_rw*/; // создать память с
+                                                                        // <INSTR_MEM_SIZE_WORDS>
+                                                                        // 32-битных ячеек
 
   initial begin
     $readmemh("../tests/program.mem", ROM);          // поместить в память ROM содержимое
