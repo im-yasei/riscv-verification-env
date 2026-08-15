@@ -20,9 +20,9 @@ import memory_pkg::INSTR_MEM_SIZE_WORDS;
                                                                         // <INSTR_MEM_SIZE_WORDS>
                                                                         // 32-битных ячеек
 
-  initial begin
-    $readmemh("../tests/program.mem", ROM);          // поместить в память ROM содержимое
-  end                                       // файла program.mem
+  // initial begin
+  //   $readmemh("../tests/program.mem", ROM); // поместить в память ROM содержимое
+  // end                                       // файла program.mem
 
   // Реализация асинхронного порта на чтение, где на выход идет ячейка памяти
   // инструкций, расположенная по адресу read_addr_i, в котором отброшены два
