@@ -10,19 +10,19 @@ A verification environment for a RISC-V processor system from MIET MPSU/APS cour
 *processor_system*
 
 ## Done
-- Compile the RTL model into a C++ simulation model using Verilator and write a simple testbench that checks the registers after the test program `program.mem` has run.
+- Compile the RTL model into a C++ simulation model using Verilator and write a simple testbench that checks the registers after the test program `program.c` has run.
 ```
-#program.mem
+#program.c
 01400293 # addi x5, x0, 20
 00728293 # addi x5, x5, 7
 00502023 # sw x5, 0(x0)
 00000073 # ecall
 ```
 - Implement a basic Test Harness API (RiscVTester class)
-
-## To Do
 - Set up the RISC-V toolchain for compiling C tests instead of writing machine code
 - Implement a program loader in C++ to replace Verilog $readmem (ProgramLoader class)
+
+## To Do
 - Implement a RISC-V reference model (GoldenModel class)
 - Implement a Scoreboard to compare DUT and GoldenModel states (Scoreboard class)
 - Set up CI with GitHub actions
