@@ -1,23 +1,36 @@
-#include "riscv_tester.hpp"
+#include "program_loader.hpp"
 #include <cstdint>
 #include <functional>
 #include <iostream>
 #include <verilated.h>
 
+void print_test_result(int errors) {
+  if (errors > 0) {
+    std::cerr << "\033[31mTEST FAILED\033[0m" << std::endl;
+    std::cerr << "\033[31mERRORS: " << errors << "\033[0m\n" << std::endl;
+  } else {
+    std::cout << "\033[32mTEST PASSED\033[0m\n" << std::endl;
+  }
+}
+
 int test_addi(RiscVTester &);
 int test_sw(RiscVTester &);
 int test_registers_backdoor_access(RiscVTester &);
 int test_memory_backdoor_access(RiscVTester &);
+int test_c_program(RiscVTester &);
 
-std::function<int(RiscVTester &)> tests[] = {test_addi, test_sw,
-                                             test_registers_backdoor_access,
-                                             test_memory_backdoor_access};
+std::function<int(RiscVTester &)> tests[] = {
+    test_addi, test_sw, test_registers_backdoor_access,
+    test_memory_backdoor_access, test_c_program};
 
 int test_addi(RiscVTester &tester) {
   int errors = 0;
   std::cout << "===test_addi started===" << std::endl;
 
   tester.system_reset();
+
+  ProgramLoader loader(tester);
+  loader.load_binary(0x0, "program.bin");
 
   for (;;) {
     if (tester.get_illegal_instruction_bit() == 1)
@@ -33,12 +46,7 @@ int test_addi(RiscVTester &tester) {
 
   std::cout << "===test_addi completed===" << std::endl;
 
-  if (errors > 0) {
-    std::cerr << "\033[31mTEST FAILED\033[0m" << std::endl;
-    std::cerr << "\033[31mERRORS: " << errors << "\033[0m\n" << std::endl;
-  } else {
-    std::cout << "\033[32mTEST PASSED\033[0m\n" << std::endl;
-  }
+  print_test_result(errors);
 
   return errors;
 }
@@ -48,6 +56,9 @@ int test_sw(RiscVTester &tester) {
   std::cout << "===test_lw started===" << std::endl;
 
   tester.system_reset();
+
+  ProgramLoader loader(tester);
+  loader.load_binary(0x0, "program.bin");
 
   for (;;) {
     if (tester.get_illegal_instruction_bit() == 1)
@@ -63,12 +74,8 @@ int test_sw(RiscVTester &tester) {
 
   std::cout << "===test_lw completed===" << std::endl;
 
-  if (errors > 0) {
-    std::cerr << "\033[31mTEST FAILED\033[0m" << std::endl;
-    std::cerr << "\033[31mERRORS: " << errors << "\033[0m\n" << std::endl;
-  } else {
-    std::cout << "\033[32mTEST PASSED\033[0m\n" << std::endl;
-  }
+  print_test_result(errors);
+
   return errors;
 }
 
@@ -77,6 +84,7 @@ int test_registers_backdoor_access(RiscVTester &tester) {
   std::cout << "===test_registers_backdoor_access started===" << std::endl;
 
   tester.system_reset();
+
   tester.write_register(6, 0x11223344);
 
   std::cout << std::hex << "x6 = 0x" << tester.read_register(6) << std::endl;
@@ -86,12 +94,8 @@ int test_registers_backdoor_access(RiscVTester &tester) {
 
   std::cout << "===test_registers_backdoor_access completed===" << std::endl;
 
-  if (errors > 0) {
-    std::cerr << "\033[31mTEST FAILED\033[0m" << std::endl;
-    std::cerr << "\033[31mERRORS: " << errors << "\033[0m\n" << std::endl;
-  } else {
-    std::cout << "\033[32mTEST PASSED\033[0m\n" << std::endl;
-  }
+  print_test_result(errors);
+
   return errors;
 }
 
@@ -125,12 +129,36 @@ int test_memory_backdoor_access(RiscVTester &tester) {
 
   std::cout << "===test_memory_backdoor_access completed===" << std::endl;
 
-  if (errors > 0) {
-    std::cerr << "\033[31mTEST FAILED\033[0m" << std::endl;
-    std::cerr << "\033[31mERRORS: " << errors << "\033[0m\n" << std::endl;
-  } else {
-    std::cout << "\033[32mTEST PASSED\033[0m\n" << std::endl;
+  print_test_result(errors);
+
+  return errors;
+}
+
+int test_c_program(RiscVTester &tester) {
+  int errors = 0;
+  std::cout << "===test_c_program started===" << std::endl;
+
+  tester.system_reset();
+
+  ProgramLoader loader(tester);
+  loader.load_binary(0x0, "test.bin");
+
+  for (;;) {
+    if (tester.get_illegal_instruction_bit() == 1)
+      break;
+    tester.tick();
   }
+
+  std::cout << std::dec << "a0 = " << tester.read_register(10) << std::endl;
+
+  if (tester.read_register(10) != 99) {
+    errors++;
+  }
+
+  std::cout << "===test_c_program completed===" << std::endl;
+
+  print_test_result(errors);
+
   return errors;
 }
 
