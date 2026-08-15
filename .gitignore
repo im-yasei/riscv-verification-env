@@ -1,3 +1,5 @@
 .clangd
 build/
+tests/*
+!tests/c_tests
 *.swp
