@@ -2,6 +2,9 @@
 #include <cstdint>
 #include <verilated.h>
 
+#define INSTR_MEM_SIZE_BYTES 512
+#define INSTR_MEM_SIZE_WORDS 128
+
 class RiscVTester {
 private:
   Vtest_top *top;
@@ -45,6 +48,10 @@ public:
   void write_byte(uint32_t addr, uint8_t value);
 
   void clear_ram();
+
+  // instrcution memory
+  void write_instruction(uint32_t addr, uint32_t instruction);
+  void clear_rom();
 
   // pc
   void set_pc(uint32_t value);

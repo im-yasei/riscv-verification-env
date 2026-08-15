@@ -16,6 +16,7 @@ void RiscVTester::system_reset() {
 
   clear_registers();
   clear_ram();
+  clear_rom();
 }
 
 void RiscVTester::evaluate() { top->eval(); }
@@ -145,6 +146,19 @@ void RiscVTester::write_byte(uint32_t addr, uint8_t value) {
 void RiscVTester::clear_ram() {
   for (int i = 0; i < 32; i++) {
     top->rootp->test_top__DOT__data_mem__DOT__ram[i] = 0;
+  }
+  evaluate();
+}
+
+// instruction memory
+void RiscVTester::write_instruction(uint32_t addr, uint32_t instruction) {
+  top->rootp->test_top__DOT__imem__DOT__ROM[addr >> 2] = instruction;
+  evaluate();
+}
+
+void RiscVTester::clear_rom() {
+  for (int i = 0; i < INSTR_MEM_SIZE_WORDS; i++) {
+    top->rootp->test_top__DOT__imem__DOT__ROM[i] = 0;
   }
   evaluate();
 }
